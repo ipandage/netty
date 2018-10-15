@@ -40,6 +40,7 @@ public final class EchoServer {
 
     public static void main(String[] args) throws Exception {
         // Configure SSL.
+		// 配置SSL
         final SslContext sslCtx;
         if (SSL) {
             SelfSignedCertificate ssc = new SelfSignedCertificate();
@@ -49,14 +50,17 @@ public final class EchoServer {
         }
 
         // Configure the server.
+		// 配置两个EventLoopGroup 对象
         EventLoopGroup bossGroup = new NioEventLoopGroup(1);
         EventLoopGroup workerGroup = new NioEventLoopGroup();
+        // 创建EchoServerHandler 对象
         final EchoServerHandler serverHandler = new EchoServerHandler();
         try {
+        	// 创建 ServerBootstrap 对象
             ServerBootstrap b = new ServerBootstrap();
-            b.group(bossGroup, workerGroup)
-             .channel(NioServerSocketChannel.class)
-             .option(ChannelOption.SO_BACKLOG, 100)
+            b.group(bossGroup, workerGroup) // 设置使用的 EventLoopGroup
+             .channel(NioServerSocketChannel.class) // 设置要被实例化的 NioServerSocketChannel
+             .option(ChannelOption.SO_BACKLOG, 100) // 设置 NioServerSocketChannel 的处理器
              .handler(new LoggingHandler(LogLevel.INFO))
              .childHandler(new ChannelInitializer<SocketChannel>() {
                  @Override
@@ -71,12 +75,15 @@ public final class EchoServer {
              });
 
             // Start the server.
+			// 绑定端口，并同步等待成功，即启动服务端
             ChannelFuture f = b.bind(PORT).sync();
 
             // Wait until the server socket is closed.
+			// 监听服务器关闭，并阻塞等待
             f.channel().closeFuture().sync();
         } finally {
             // Shut down all event loops to terminate all threads.
+			// 优雅关闭两个 EventLoopGroup 对象
             bossGroup.shutdownGracefully();
             workerGroup.shutdownGracefully();
         }
