@@ -49,12 +49,18 @@ import java.util.Map;
  */
 public abstract class AbstractBootstrap<B extends AbstractBootstrap<B, C>, C extends Channel> implements Cloneable {
 
+	// EventLoopGroup 对象
     volatile EventLoopGroup group;
     @SuppressWarnings("deprecation")
+	// Channel 工厂，用于创建Channel对象
     private volatile ChannelFactory<? extends C> channelFactory;
+    // 本地地址
     private volatile SocketAddress localAddress;
+    // 可选项集合
     private final Map<ChannelOption<?>, Object> options = new LinkedHashMap<ChannelOption<?>, Object>();
+    // 属性集合
     private final Map<AttributeKey<?>, Object> attrs = new LinkedHashMap<AttributeKey<?>, Object>();
+    // 处理器
     private volatile ChannelHandler handler;
 
     AbstractBootstrap() {
@@ -82,7 +88,7 @@ public abstract class AbstractBootstrap<B extends AbstractBootstrap<B, C>, C ext
         if (group == null) {
             throw new NullPointerException("group");
         }
-        if (this.group != null) {
+        if (this.group != null) { // 不允许重复设置
             throw new IllegalStateException("group set already");
         }
         this.group = group;
